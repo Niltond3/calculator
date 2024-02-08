@@ -2,9 +2,23 @@
 import {Button} from "@/components/Button";
 import Image from "next/image";
 import React from "react";
+export interface screenProps {
+  result: string;
+  value: string;
+  negative: boolean;
+  bracketCount?: number;
+  bracketClose: string;
+}
 
 export default function Home() {
-  const [screen, setScreen] = React.useState('0');
+
+  const [screen, setScreen] = React.useState<screenProps>({
+    result:'0',
+    value:'0',
+    negative:false,
+    bracketCount: undefined,
+    bracketClose:''
+  });
 
   return (
     <main className="h-screen bg-white text-slate-800 antialiased dark:bg-slate-900 dark:text-slate-100 flex justify-center items-center">
@@ -24,7 +38,7 @@ export default function Home() {
           </div>
           <div className="flex justify-end">
           <span>
-              {screen}
+              {screen.negative && '-'}{screen.value}{screen.bracketCount && <span className="opacity-60">{screen.bracketClose}</span>}
           </span>
           </div>
       </div>
@@ -32,13 +46,13 @@ export default function Home() {
         <div className="flex flex-col w-52">
         <div>
           <Button.Root setNumber={setScreen} onScreen={screen}>
-            <Button.Function>CE</Button.Function>
+            <Button.Function action="ce">CE</Button.Function>
           </Button.Root>
           <Button.Root setNumber={setScreen} onScreen={screen}>
-            <Button.Function>C</Button.Function>
+            <Button.Function action="c">C</Button.Function>
           </Button.Root>
           <Button.Root setNumber={setScreen} onScreen={screen}>
-            <Button.Function>
+            <Button.Function action="delete">
               <Image
                 src="/delete.svg"
                 alt="delete icon"
@@ -51,13 +65,13 @@ export default function Home() {
           </div>
           <div>
           <Button.Root setNumber={setScreen} onScreen={screen}>
-            <Button.Function>(</Button.Function>
+            <Button.Function action="(">(</Button.Function>
           </Button.Root>
           <Button.Root setNumber={setScreen} onScreen={screen}>
-            <Button.Function>)</Button.Function>
+            <Button.Function action=")">)</Button.Function>
           </Button.Root>
           <Button.Root setNumber={setScreen} onScreen={screen}>
-            <Button.Function>%</Button.Function>
+            <Button.Operator>%</Button.Operator>
           </Button.Root>
           </div>
           <div className="flex flex-row flex-wrap">
@@ -89,7 +103,7 @@ export default function Home() {
             <Button.Number number={3}/>
           </Button.Root>
           <Button.Root setNumber={setScreen} onScreen={screen}>
-            <Button.Function>
+            <Button.Function action="change">
               <Image
                 src="/plusMinus.svg"
                 alt="plusMinus icon"

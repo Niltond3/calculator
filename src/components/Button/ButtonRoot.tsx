@@ -1,19 +1,50 @@
+import { screenProps } from "@/app/page";
 import { ComponentProps, MouseEventHandler } from "react"
 
 interface ButtonRootProps extends ComponentProps<'button'>{
   className?: string 
-  onScreen: string
-  setNumber: React.Dispatch<React.SetStateAction<string>>
+  onScreen: screenProps
+  setNumber: React.Dispatch<React.SetStateAction<screenProps>>
 }
 export function ButtonRoot({className, onScreen, setNumber, ...props}: ButtonRootProps) {
 
   const handleClick = (event:React.MouseEvent<HTMLElement, MouseEvent>) => {
     const children =  event.currentTarget.children[0];
-    const label = children.ariaLabel ? event.currentTarget.children[0].ariaLabel : 'default'
+    const label = children.ariaLabel || 'default'
 
     const actionsMap = {
       number: () => {
-        setNumber(`${onScreen.startsWith('0') ? '' : onScreen}${children.innerHTML}`)
+        const {value} = onScreen;
+        const newValue= `${value.startsWith('0') ? '' : value}${children.innerHTML}`
+        setNumber({...onScreen, value:newValue })
+      },
+      function: () =>{
+        const functionActionMap ={
+          ce: ()=> setNumber({...onScreen,value:'0',result:'0',bracketClose:'',bracketCount:undefined}),
+          c:()=> setNumber({...onScreen,value:'0',bracketClose:'',bracketCount:undefined}),
+          delete:()=> {
+            const {value, bracketCount, bracketClose} = onScreen
+            const newValue = value.length === 1 ? '0' : value.slice(0, -1)
+            if(value.endsWith('(')){
+              console.log('ends')
+              const newbracketCount = bracketCount! - 1;
+              const newbracketClose = bracketClose.slice(0, -1)
+              setNumber({...onScreen,value:newValue, bracketCount:newbracketCount, bracketClose: newbracketClose})
+          } else  setNumber({...onScreen,value:newValue})
+          },
+          change:()=> setNumber({...onScreen,negative:!onScreen.negative}),
+          '(':()=>{
+            const {value, bracketCount, bracketClose} = onScreen;
+            const newValue= `${value.startsWith('0') ? '' : value}(`
+            const newBracketClose = `${bracketClose})`
+            setNumber({...onScreen,value:newValue,bracketCount:bracketCount ? bracketCount +1 : 1, bracketClose:newBracketClose})
+          },
+          ')':()=>{},
+        }
+        const action = children.getAttribute('data-action') as keyof typeof functionActionMap
+
+        functionActionMap[action]()
+
       },
       default: () => console.log('not map yet')
     }
