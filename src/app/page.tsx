@@ -6,17 +6,15 @@ export interface screenProps {
   result: string;
   value: string;
   negative: boolean;
-  bracketCount?: number;
   bracketClose: string;
 }
 
 export default function Home() {
 
   const [screen, setScreen] = React.useState<screenProps>({
-    result:'0',
+    result:'',
     value:'0',
     negative:false,
-    bracketCount: undefined,
     bracketClose:''
   });
 
@@ -24,21 +22,24 @@ export default function Home() {
     <main className="h-screen bg-white text-slate-800 antialiased dark:bg-slate-900 dark:text-slate-100 flex justify-center items-center">
     <div className="flex h-fit flex-col border border-white p-2 rounded-3xl ">
       <div className="border-white/20 border p-2 m-2 rounded-2xl flex flex-col">
-          <div>
-          <span>
-          <Image
-              src="/history.svg"
-              alt="history icon"
-              className="dark:invert opacity-20 hover:opacity-60 transition h-auto"
-              width={16}
-              height={24}
-              priority
-            />
-          </span>
+          <div className="flex">
+            <span>
+            <Image
+                src="/history.svg"
+                alt="history icon"
+                className="dark:invert opacity-20 hover:opacity-60 transition h-auto"
+                width={16}
+                height={24}
+                priority
+              />
+            </span>
+            <div className="flex justify-end items-end w-full">
+              {screen.result && <span className="text-xs opacity-80">{screen.result}</span>}
+            </div>
           </div>
           <div className="flex justify-end">
           <span>
-              {screen.negative && '-'}{screen.value}{screen.bracketCount && <span className="opacity-60">{screen.bracketClose}</span>}
+              {screen.negative && '-'}{screen.value}{screen.bracketClose && <span className="opacity-60">{screen.bracketClose}</span>}
           </span>
           </div>
       </div>
@@ -127,7 +128,7 @@ export default function Home() {
             <Button.Operator>/</Button.Operator>
           </Button.Root>
           <Button.Root setNumber={setScreen} onScreen={screen}>
-            <Button.Operator>x</Button.Operator>
+            <Button.Operator>*</Button.Operator>
           </Button.Root>
           <Button.Root setNumber={setScreen} onScreen={screen}>
             <Button.Operator>-</Button.Operator>

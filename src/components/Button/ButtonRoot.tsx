@@ -1,5 +1,8 @@
 import { screenProps } from "@/app/page";
-import { ComponentProps, MouseEventHandler } from "react"
+import { ComponentProps } from "react"
+import {
+evaluate
+} from 'mathjs'
 
 interface ButtonRootProps extends ComponentProps<'button'>{
   className?: string 
@@ -10,7 +13,6 @@ export function ButtonRoot({className, onScreen, setNumber, ...props}: ButtonRoo
 
   const handleClick = (event:React.MouseEvent<HTMLElement, MouseEvent>) => {
     const children =  event.currentTarget.children[0];
-    const label = children.ariaLabel || 'default'
 
     const actionsMap = {
       number: () => {
@@ -20,38 +22,61 @@ export function ButtonRoot({className, onScreen, setNumber, ...props}: ButtonRoo
       },
       function: () =>{
         const functionActionMap ={
-          ce: ()=> setNumber({...onScreen,value:'0',result:'0',bracketClose:'',bracketCount:undefined}),
-          c:()=> setNumber({...onScreen,value:'0',bracketClose:'',bracketCount:undefined}),
+          ce: ()=> setNumber({...onScreen,value:'0',result:'',bracketClose:''}),
+          c:()=> setNumber({...onScreen,value:'0',bracketClose:''}),
           delete:()=> {
-            const {value, bracketCount, bracketClose} = onScreen
-            const newValue = value.length === 1 ? '0' : value.slice(0, -1)
+            const {value, bracketClose} = onScreen
+            const newValue = value.length === 1 ? '0' : value.endsWith(' ') ? value.slice(0, -3) : value.slice(0, -1)
+
             if(value.endsWith('(')){
-              console.log('ends')
-              const newbracketCount = bracketCount! - 1;
               const newbracketClose = bracketClose.slice(0, -1)
-              setNumber({...onScreen,value:newValue, bracketCount:newbracketCount, bracketClose: newbracketClose})
-          } else  setNumber({...onScreen,value:newValue})
+              setNumber({...onScreen,value:newValue, bracketClose: newbracketClose})
+              return
+            }
+            setNumber({...onScreen,value:newValue})
           },
-          change:()=> setNumber({...onScreen,negative:!onScreen.negative}),
+          change:()=> {
+            const {value} = onScreen;
+            if(!value.startsWith('0')) setNumber({...onScreen,negative:!onScreen.negative})
+          },
           '(':()=>{
-            const {value, bracketCount, bracketClose} = onScreen;
+            const {value, bracketClose} = onScreen;
             const newValue= `${value.startsWith('0') ? '' : value}(`
-            const newBracketClose = `${bracketClose})`
-            setNumber({...onScreen,value:newValue,bracketCount:bracketCount ? bracketCount +1 : 1, bracketClose:newBracketClose})
+            setNumber({...onScreen,value:newValue, bracketClose:`${bracketClose})`})
           },
-          ')':()=>{},
+          ')':()=>{
+            const {value, bracketClose} = onScreen
+            if (bracketClose !== ''){
+              setNumber({...onScreen,value: value+')',bracketClose: bracketClose.slice(0, -1)})
+            }
+          },
         }
         const action = children.getAttribute('data-action') as keyof typeof functionActionMap
 
         functionActionMap[action]()
 
       },
-      default: () => console.log('not map yet')
+      operator: () => {
+        const actionsMap = {
+          default : () => {
+            const {value} = onScreen;
+            const newValue= `${value.startsWith('0') ? '' : value} ${children.innerHTML} `
+            setNumber({...onScreen, value:newValue })
+          }, 
+          '=' : () => {
+            const {value,bracketClose} = onScreen;
+            setNumber({...onScreen,result:evaluate(value+bracketClose)})
+          }, 
+        }
+        const action = children.innerHTML === '=' ? '=' : 'default'
+        console.log(action)
+        actionsMap[action]()
+      },
     }
 
    
     
-    const action = label as keyof typeof actionsMap
+    const action = children.ariaLabel as keyof typeof actionsMap
 
     actionsMap[action]()
   }
