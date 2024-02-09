@@ -1,6 +1,8 @@
 "use client"
 import {Button} from "@/components/Button";
+import Dialog from "@/components/Dialog/DialogRoot";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 export interface screenProps {
   result: string;
@@ -20,10 +22,11 @@ export default function Home() {
 
   return (
     <main className="h-screen bg-white text-slate-800 antialiased dark:bg-slate-900 dark:text-slate-100 flex justify-center items-center">
+    <Dialog></Dialog>
     <div className="flex h-fit flex-col border border-white p-2 rounded-3xl ">
       <div className="border-white/20 border p-2 m-2 rounded-2xl flex flex-col">
           <div className="flex">
-            <span>
+            <Link href='/?showDialog=y'>
             <Image
                 src="/history.svg"
                 alt="history icon"
@@ -32,7 +35,7 @@ export default function Home() {
                 height={24}
                 priority
               />
-            </span>
+            </Link>
             <div className="flex justify-end items-end w-full">
               {screen.result && <span className="text-xs opacity-80">{screen.result}</span>}
             </div>
