@@ -1,12 +1,13 @@
 "use client"
 import {Button} from "@/components/Button";
-import Dialog from "@/components/Dialog/DialogRoot";
+import {Dialog} from "@/components/Dialog";
 import Image from "next/image";
-import Link from "next/link";
 import React from "react";
+
+
 export interface screenProps {
-  result: string;
-  value: string;
+  lastCalc: string;
+  calc: string;
   negative: boolean;
   bracketClose: string;
 }
@@ -14,35 +15,37 @@ export interface screenProps {
 export default function Home() {
 
   const [screen, setScreen] = React.useState<screenProps>({
-    result:'',
-    value:'0',
+    lastCalc:'',
+    calc:'0',
     negative:false,
-    bracketClose:''
+    bracketClose:'',
   });
-
   return (
     <main className="h-screen bg-white text-slate-800 antialiased dark:bg-slate-900 dark:text-slate-100 flex justify-center items-center">
-    <Dialog></Dialog>
     <div className="flex h-fit flex-col border border-white p-2 rounded-3xl ">
+
       <div className="border-white/20 border p-2 m-2 rounded-2xl flex flex-col">
           <div className="flex">
-            <Link href='/?showDialog=y'>
-            <Image
-                src="/history.svg"
-                alt="history icon"
-                className="dark:invert opacity-20 hover:opacity-60 transition h-auto"
-                width={16}
-                height={24}
-                priority
-              />
-            </Link>
+            <Dialog.Root>
+              <Dialog.Trigger>
+                <Image
+                  src="/history.svg"
+                  alt="history icon"
+                  className="dark:invert opacity-20 hover:opacity-60 transition h-auto"
+                  width={16}
+                  height={24}
+                  priority
+                />
+              </Dialog.Trigger>
+              <Dialog.Body showBackdrop/>
+            </Dialog.Root>
             <div className="flex justify-end items-end w-full">
-              {screen.result && <span className="text-xs opacity-80">{screen.result}</span>}
+              {screen.lastCalc && <span className="text-xs opacity-80">{screen.lastCalc}</span>}
             </div>
           </div>
           <div className="flex justify-end">
           <span>
-              {screen.negative && '-'}{screen.value}{screen.bracketClose && <span className="opacity-60">{screen.bracketClose}</span>}
+              {screen.negative && '-'}{screen.calc}{screen.bracketClose && <span className="opacity-60">{screen.bracketClose}</span>}
           </span>
           </div>
       </div>
